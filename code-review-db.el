@@ -35,6 +35,14 @@
 (require 'uuidgen)
 (require 'dash)
 
+(when (>= emacs-major-version 29)
+  (define-advice closql--abbrev-class (:filter-args (args) code-review--handle-class-struct)
+    "Handle case where class is an eieio--class struct instead of symbol."
+    (let ((class (car args)))
+      (list (if (eieio--class-p class)
+                (eieio--class-name class)
+              class)))))
+
 (defcustom code-review-db-database-file
   (expand-file-name "code-review-db-file.sqlite" user-emacs-directory)
   "The file used to store the `code-review' database."
