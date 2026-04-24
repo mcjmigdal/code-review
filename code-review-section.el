@@ -1792,9 +1792,10 @@ If you want to provide a MSG for the end of the process."
         (progress-reporter-update progress 1)
         (deferred:$
           (deferred:parallel
-            (lambda () (code-review-diff-deferred obj))
-            (lambda () (code-review-infos-deferred obj))
-            (lambda () (code-review-infos-deferred obj t)))
+           (vector ;; FIX: deferred:parallel requires a sequence (vector is best)
+            (lambda (&rest _) (code-review-diff-deferred obj))   ;; FIX: Arity &rest _
+            (lambda (&rest _) (code-review-infos-deferred obj))  ;; FIX: Arity &rest _
+            (lambda (&rest _) (code-review-infos-deferred obj t)))) ;; FIX: Arity &rest _
           (deferred:nextc it
             (lambda (x)
               (when code-review-log-raw-request-responses

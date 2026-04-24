@@ -416,21 +416,23 @@ Optionally sets FALLBACK? to get minimal query."
   "Submit replies to review comments inline given REPLIES and a CALLBACK fn."
   (let ((pr (oref replies pr)))
     (deferred:$
-      (deferred:parallel
-        (-map
-         (lambda (reply)
-           (lambda ()
-             (glab-post (format "/v4/projects/%s/merge_requests/%s/discussions/%s/notes"
-                                (code-review-gitlab--project-id pr)
-                                (oref pr number)
-                                (oref reply reply-to-id))
-                        nil
-                        :payload (a-alist 'body (oref reply body))
-                        :auth code-review-auth-login-marker
-                        :host code-review-gitlab-host
-                        :errorback #'code-review-gitlab-errback
-                        :callback (lambda (&rest _)))))
-         (oref replies replies)))
+     (deferred:parallel
+      (vconcat ;; <--- FIX 1: Convert list to vector
+       (-map
+        (lambda (reply)
+          (lambda (&rest _) ;; <--- FIX 2: Add &rest _ to accept deferred arg
+            (glab-post (format "/v4/projects/%s/merge_requests/%s/discussions/%s/notes"
+                               (code-review-gitlab--project-id pr)
+                               (oref pr number)
+                               (oref reply reply-to-id))
+                       nil
+                       :payload (a-alist 'body (oref reply body))
+                       :auth code-review-auth-login-marker
+                       :host code-review-gitlab-host
+                       :errorback #'code-review-gitlab-errback
+                       :callback (lambda (&rest _)))))
+        (oref replies replies))))
+
 
       (deferred:wait 500)
 

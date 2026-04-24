@@ -142,7 +142,7 @@ OUTDATED."
    ["Merge"
     ("m m" "Merge" code-review-merge-merge)
     ("m r" "Merge Rebase" code-review-merge-rebase)
-    ("m s" "Merge Squash" code-review-merge-squash)]]
+    ("m s" "Merge Squash" code-review-merge-squash)]
   ["Fast track"
    ("l" "LGTM - Approved" code-review-submit-lgtm)
    ("p" "Submit Replies" code-review-submit-only-replies)
